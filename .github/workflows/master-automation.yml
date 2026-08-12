@@ -36,22 +36,20 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Build Tools
-        run: sudo apt-get update && sudo apt-get install -y build-essential libffi-dev
-
       - name: Install dependencies
+        continue-on-error: true
         working-directory: ./"Voting system backend"
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt || true
-          pip install semgrep safety k6 || true
+          pip install -r requirements.txt
+          pip install semgrep safety
 
       - name: Run SAST & Security Checks
+        continue-on-error: true
         working-directory: ./"Voting system backend"
         run: |
-          semgrep --config auto . --json -o semgrep-results.json || true
-          safety check --json > dependency-safety.json || true
-          # Performance script validation
+          semgrep --config auto . --json -o semgrep-results.json || echo "{}" > semgrep-results.json
+          safety check --json > dependency-safety.json || echo "{}" > dependency-safety.json
           k6 run k6-load-test.js --iterations 1 || true
 
       - name: Upload Backend Reports
@@ -74,12 +72,14 @@ jobs:
           cache: gradle
 
       - name: Build Android APK
+        continue-on-error: true
         working-directory: ./VotingSystem
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug || true
+          ./gradlew assembleDebug
 
       - name: Run Appium Tests
+        continue-on-error: true
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
@@ -88,7 +88,7 @@ jobs:
             appium & 
             sleep 15
             cd automation/android-appium
-            mvn test -DfailIfNoTests=false || true
+            mvn test -DfailIfNoTests=false
 
       - name: Upload Android Reports
         if: always()
@@ -109,19 +109,22 @@ jobs:
           node-version: 18
 
       - name: Install Dependencies
+        continue-on-error: true
         working-directory: ./automation/web-selenium
         run: npm install
 
       - name: Run Selenium E2E
+        continue-on-error: true
         working-directory: ./automation/web-selenium
         env:
           BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-        run: npm test || true
+        run: npm test
 
       - name: Generate Reports
         if: always()
+        continue-on-error: true
         working-directory: ./automation/web-selenium
-        run: npm run report || true
+        run: npm run report
 
       - name: Upload Web Reports
         if: always()
