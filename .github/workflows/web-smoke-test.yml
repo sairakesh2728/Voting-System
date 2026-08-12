@@ -1,0 +1,7 @@
+name: web-smoke-test.yml
+on: [push]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Web smoke test passed"

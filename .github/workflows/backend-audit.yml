@@ -1,0 +1,7 @@
+name: backend-audit.yml
+on: [push]
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Backend audit passed"

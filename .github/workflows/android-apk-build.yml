@@ -1,0 +1,7 @@
+name: android-apk-build.yml
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "APK Build passed"

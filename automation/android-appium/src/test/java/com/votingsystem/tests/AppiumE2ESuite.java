@@ -45,6 +45,6 @@ public class AppiumE2ESuite extends BaseTest {
 
     @AfterClass
     public void generateReports() {
-        ExcelReporter.generateReport("reports/Excel/Android_Automation_Report.xlsx", results);
+        ExcelReporter.generateReport("reports/Excel/Mobile-E2E-Report.xlsx", results);
     }
 }
