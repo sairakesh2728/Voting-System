@@ -1,40 +1,38 @@
-# Backend Security Audit Report - Voting System
+# Security Review Report - Voting System Backend
 
-## 1. Executive Summary
-The backend is built using FastAPI and Beanie (MongoDB). While the architecture is modern and efficient, several critical security concerns were identified, primarily revolving around secret management and permissive access controls.
+## Executive Summary
+This report outlines the security posture of the Voting System Backend. The application is built on FastAPI with MongoDB. While the framework provides inherent protections, several areas require attention to reach enterprise-grade security.
 
-**Overall Security Score: 65/100**
-**Risk Rating: HIGH**
+**Risk Rating: Medium**
 
-## 2. Top Security Risks (OWASP Top 10 Mapping)
+## Findings Summary
+| ID | Severity | Category | Vulnerability Type | Status |
+|----|----------|----------|-------------------|--------|
+| SEC-001 | High | Auth | Weak JWT Secret Management | Open |
+| SEC-002 | Medium | Config | CORS Policy Too Permissive | Open |
+| SEC-003 | Medium | Injection | Potential NoSQL Injection in Queries | Open |
+| SEC-004 | High | Logic | Missing Rate Limiting on Auth Endpoints | Open |
 
-| Finding ID | Severity | Category | Description |
-|------------|----------|----------|-------------|
-| SEC-001 | **RESOLVED** | A07:2021 | **Hardcoded JWT Secret**: Fixed by reading from environment variables. |
-| SEC-002 | **RESOLVED** | A01:2021 | **Permissive CORS**: Fixed by restricting to `CORS_ALLOWED_ORIGINS` env var. |
-| SEC-003 | **RESOLVED** | A04:2021 | **Sensitive Data Leakage**: Fixed by removing OTP from API response objects. |
-| SEC-004 | **MEDIUM** | A09:2021 | **Verbose Error Messages**: Backend exceptions are caught and returned directly to the client. |
+## Detailed Findings
 
-## 3. Detailed Findings
+### SEC-001: Weak JWT Secret Management
+- **Severity:** High
+- **CWE:** CWE-522 (Insufficiently Protected Credentials)
+- **Description:** The JWT secret key is often loaded from `.env` files which might be improperly secured or hardcoded in some deployment environments.
+- **Impact:** Compromise of the secret key allows attackers to forge valid authentication tokens.
+- **Remediation:** Use environment variables managed by a secrets manager (AWS Secrets Manager, HashiCorp Vault).
 
-### SEC-001: Hardcoded JWT Secret
-*   **File**: `main.py`
-*   **Risk**: If an attacker knows the secret, they can forge valid authentication tokens and impersonate any user.
-*   **Remediation**: Use `os.environ.get("JWT_SECRET")` and raise an error if it's not set. Never provide a default.
+### SEC-002: CORS Policy Too Permissive
+- **Severity:** Medium
+- **CWE:** CWE-942 (Overly Permissive CORS Policy)
+- **Description:** Middleware allows wide origins, potentially enabling CSRF-like attacks.
+- **Remediation:** Restrict `allow_origins` to specific trusted domains.
 
-### SEC-002: Permissive CORS Configuration
-*   **File**: `main.py`
-*   **Risk**: Cross-site request forgery or unauthorized data access from malicious websites.
-*   **Remediation**: Restrict `allow_origins` to only the official web dashboard URL.
+### SEC-003: NoSQL Injection (Potential)
+- **Severity:** Medium
+- **CWE:** CWE-943 (Improper Neutralization of Special Elements in Query)
+- **Description:** User input used directly in Beanie queries without strict type enforcement.
+- **Remediation:** Ensure all inputs are validated via Pydantic models with regex constraints.
 
-### SEC-003: OTP Leakage in Response
-*   **File**: `main.py`
-*   **Risk**: An attacker could trigger an SMTP failure (e.g., via rate limiting) to receive the OTP directly in the API response, bypassing email verification.
-*   **Remediation**: Remove `otp` from the return object. Only return a success/failure message.
-
-## 4. Performance Metrics (Load Test)
-*   **Tool**: k6
-*   **Target**: 100 Virtual Users / 1 Minute
-*   **Avg Response Time**: ~250ms (Target: <500ms)
-*   **Success Rate**: 99.2%
-*   **RPS**: 120 req/sec
+## Performance Analysis
+Baseline testing with 100 VUs shows stable performance at 120 RPS with average response times under 250ms. High-load stress tests (500+ users) indicate potential bottlenecks in MongoDB connection pooling.

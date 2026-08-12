@@ -1,0 +1,52 @@
+name: Backend Security & Performance Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          cd "Voting system backend"
+          pip install -r requirements.txt
+          pip install semgrep safety
+
+      - name: Run Semgrep (SAST)
+        run: |
+          cd "Voting system backend"
+          semgrep --config auto . --json -o semgrep-results.json || true
+
+      - name: Dependency Safety Check
+        run: |
+          cd "Voting system backend"
+          safety check --json > dependency-safety.json || true
+
+      - name: Run k6 Load Test
+        uses: grafana/k6-action@v0.3.0
+        with:
+          filename: "Voting system backend/k6-load-test.js"
+          flags: --env API_URL=http://localhost:8000
+        continue-on-error: true
+
+      - name: Upload Security Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-security-reports
+          path: |
+            Voting system backend/backend-inventory.md
+            Voting system backend/security-review.md
+            Voting system backend/k6-load-test.js
+            Voting system backend/*.json
