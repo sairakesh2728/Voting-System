@@ -1,0 +1,18 @@
+{
+  "name": "voting-system-web-automation",
+  "version": "1.0.0",
+  "description": "Enterprise-grade Selenium testing for Voting System",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests/**/*.test.js --timeout 60000",
+    "report": "node utils/generateReport.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.18.0",
+    "mocha": "^10.3.0",
+    "chai": "^4.4.1",
+    "xlsx": "^0.18.5",
+    "dotenv": "^16.4.5",
+    "mochawesome": "^7.1.3"
+  }
+}

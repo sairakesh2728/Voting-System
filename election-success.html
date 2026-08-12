@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success - Voting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-[#2C5364] flex items-center justify-center min-h-screen px-6 font-sans">
+    <div class="bg-white p-10 rounded-[3rem] shadow-2xl w-full max-w-md text-center">
+        <div class="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 animate-bounce">
+            <i class="fas fa-check text-4xl"></i>
+        </div>
+
+        <h2 class="text-3xl font-black text-gray-800">Success!</h2>
+        <p class="text-gray-500 mt-3">Your election has been scheduled and is now live.</p>
+
+        <div class="mt-10 p-6 bg-gray-50 rounded-3xl border border-gray-100">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-2">Election Code</p>
+            <h3 id="displayCode" class="text-4xl font-black text-[#2C5364] tracking-widest">XXXXXX</h3>
+            <button onclick="copyCode()" class="mt-4 text-[#2C5364] text-xs font-bold hover:underline">
+                <i class="fas fa-copy mr-1"></i> COPY CODE
+            </button>
+        </div>
+
+        <button onclick="window.location.href='home.html'"
+            class="w-full mt-10 py-5 bg-[#2C5364] text-white rounded-[2rem] font-bold shadow-xl hover:bg-[#244452] transition-all transform active:scale-95">
+            GO TO DASHBOARD
+        </button>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        document.getElementById('displayCode').innerText = code;
+
+        function copyCode() {
+            navigator.clipboard.writeText(code);
+            alert('Code copied to clipboard!');
+        }
+    </script>
+</body>
+</html>

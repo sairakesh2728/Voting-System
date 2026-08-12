@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Participants - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans pb-10">
+    <header class="bg-[#2C5364] text-white px-6 py-8 shadow-xl">
+        <div class="flex items-center space-x-4">
+            <a href="../home.html" class="text-white/70 hover:text-white">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-xl font-bold">Review Applications</h1>
+        </div>
+    </header>
+
+    <main class="px-6 mt-8 max-w-2xl mx-auto">
+        <div id="applicationsList" class="space-y-4">
+            <div class="animate-pulse bg-white p-6 rounded-3xl h-24"></div>
+        </div>
+    </main>
+
+    <script src="../api.js"></script>
+    <script>
+        const token = checkAuth();
+        const urlParams = new URLSearchParams(window.location.search);
+        const electionId = urlParams.get('id');
+
+        async function loadApplications() {
+            try {
+                // First get participants
+                const response = await fetch(`${API_BASE_URL}/elections/${electionId}/participants`, {
+                    headers: { 'Authorization': token }
+                });
+                const participants = await response.json();
+
+                const container = document.getElementById('applicationsList');
+                container.innerHTML = '';
+
+                const pending = participants.filter(p => p.status === 'pending');
+
+                if (pending.length === 0) {
+                    container.innerHTML = '<div class="text-center py-20 text-gray-400 font-bold">No pending applications</div>';
+                    return;
+                }
+
+                pending.forEach(p => {
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between";
+                    div.innerHTML = `
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-lg">${p.full_name}</h3>
+                            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">${p.id_number}</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="updateStatus('${p.id}', 'rejected')" class="w-10 h-10 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button onclick="updateStatus('${p.id}', 'approved')" class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-colors">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function updateStatus(participantId, status) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/elections/participants/${participantId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status })
+                });
+                if (response.ok) {
+                    loadApplications();
+                } else {
+                    alert('Error updating status');
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        }
+
+        loadApplications();
+    </script>
+</body>
+</html>
