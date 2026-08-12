@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Voting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans min-h-screen pb-32">
+    <!-- Header Section -->
+    <div class="bg-[#2C5364] pt-10 pb-24 px-6 rounded-b-[3rem] shadow-xl relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <i class="fas fa-vote-yea text-[15rem] -right-10 -bottom-10 absolute rotate-12 text-white"></i>
+        </div>
+
+        <header class="flex items-center justify-between relative z-10 text-white mb-6">
+            <a href="home.html" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md hover:bg-white/20 transition-all">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="text-xl font-bold tracking-tight">My Profile</h1>
+            <div class="w-10"></div>
+        </header>
+    </div>
+
+    <!-- Profile Card Container -->
+    <div class="px-6 -mt-16 relative z-20">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center text-center border border-gray-100">
+            <div class="w-24 h-24 bg-blue-50 text-[#2C5364] rounded-[2rem] flex items-center justify-center text-4xl shadow-inner mb-6 relative">
+                <i class="fas fa-user-tie"></i>
+                <div class="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 border-4 border-white rounded-full"></div>
+            </div>
+
+            <h2 id="profName" class="text-3xl font-black text-gray-800">Loading...</h2>
+            <p id="profEmail" class="text-gray-400 font-bold mt-1">user@example.com</p>
+
+            <div class="w-full h-px bg-gray-50 my-8"></div>
+
+            <div class="flex justify-around w-full">
+                <div class="text-center">
+                    <p id="voteCount" class="text-2xl font-black text-[#2C5364]">0</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Votes Cast</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-2xl font-black text-[#2C5364]">Verified</p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Status</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Section -->
+    <main class="mt-8 px-6 space-y-4">
+        <h3 class="font-bold text-gray-400 uppercase text-[10px] tracking-[0.2em] ml-4 mb-2">Account Settings</h3>
+
+        <button onclick="window.location.href='security-privacy.html'" class="w-full bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between hover:bg-gray-50 transition-all group">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <span class="font-bold text-gray-700">Security & Privacy</span>
+            </div>
+            <i class="fas fa-chevron-right text-gray-300"></i>
+        </button>
+
+        <button onclick="logout()" class="w-full bg-red-50/50 p-5 rounded-3xl border border-red-100 flex items-center justify-center space-x-3 text-red-600 font-black hover:bg-red-50 transition-all transform active:scale-95">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>LOG OUT</span>
+        </button>
+    </main>
+
+    <!-- Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-4 flex justify-between items-center z-50 rounded-t-[2.5rem] shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+        <a href="home.html" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-house text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">Home</span>
+        </a>
+        <a href="my-elections.html" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">My Polls</span>
+        </a>
+        <div class="w-12 h-12 bg-[#2C5364] text-white rounded-2xl flex items-center justify-center -mt-12 shadow-lg shadow-[#2C5364]/40 border-4 border-white" onclick="window.location.href='join-election.html'">
+            <i class="fas fa-plus"></i>
+        </div>
+        <a href="joined-elections.html" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-history text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">History</span>
+        </a>
+        <a href="profile.html" class="text-[#2C5364] flex flex-col items-center">
+            <i class="fas fa-user text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+        </a>
+    </nav>
+
+    <script src="api.js"></script>
+    <script>
+        const token = checkAuth();
+        document.getElementById('profName').innerText = localStorage.getItem('userName') || 'Voter';
+        document.getElementById('profEmail').innerText = localStorage.getItem('userEmail') || '';
+
+        async function loadProfileData() {
+            try {
+                const joined = await api.getJoinedElections(token);
+                document.getElementById('voteCount').innerText = joined.length;
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        loadProfileData();
+    </script>
+</body>
+</html>

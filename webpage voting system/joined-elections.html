@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Voting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans pb-24">
+    <header class="bg-white px-6 py-8 flex items-center shadow-sm">
+        <a href="home.html" class="text-gray-400 hover:text-gray-600 mr-4">
+            <i class="fas fa-arrow-left text-xl"></i>
+        </a>
+        <h1 class="text-2xl font-extrabold text-gray-800 tracking-tight">Polls I've Joined</h1>
+    </header>
+
+    <main class="px-6 mt-6 max-w-lg mx-auto">
+        <div id="joinedList" class="space-y-4">
+            <div class="animate-pulse bg-white p-6 rounded-[2.5rem] border border-gray-100">
+                <div class="h-6 w-1/2 bg-gray-100 rounded mb-4"></div>
+                <div class="h-4 w-1/3 bg-gray-100 rounded"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-4 flex justify-between items-center z-50 rounded-t-[2.5rem] shadow-lg">
+        <a href="home.html" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-house text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">Home</span>
+        </a>
+        <a href="my-elections.html" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">My Polls</span>
+        </a>
+        <div class="w-12 h-12 bg-[#2C5364] text-white rounded-2xl flex items-center justify-center -mt-12 shadow-lg" onclick="window.location.href='join-election.html'">
+            <i class="fas fa-plus"></i>
+        </div>
+        <a href="joined-elections.html" class="text-[#2C5364] flex flex-col items-center">
+            <i class="fas fa-history text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">History</span>
+        </a>
+        <a href="profile.html" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-user text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+        </a>
+    </nav>
+
+    <script src="api.js"></script>
+    <script>
+        const token = checkAuth();
+
+        async function loadJoined() {
+            try {
+                const elections = await api.getJoinedElections(token);
+                const list = document.getElementById('joinedList');
+                list.innerHTML = '';
+
+                if (elections.length === 0) {
+                    list.innerHTML = `
+                        <div class="text-center py-20 bg-white rounded-[2.5rem] border border-gray-100">
+                            <i class="fas fa-ghost text-5xl text-gray-100 mb-4"></i>
+                            <p class="text-gray-400 font-bold">No election history found.</p>
+                            <a href="join-election.html" class="inline-block mt-4 text-[#2C5364] font-bold underline">Join one now</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                elections.forEach(el => {
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer group flex items-center justify-between";
+                    div.onclick = () => window.location.href = `voting.html?id=${el.id}`;
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-5">
+                            <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-[1.5rem] flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">
+                                ${el.name.charAt(0)}
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-gray-800 text-lg group-hover:text-[#2C5364] transition-colors">${el.name}</h3>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">${el.date}${el.time ? ' • ' + el.time : (el.start_time ? ' • ' + el.start_time : '')}</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-200 group-hover:text-[#2C5364] transition-colors"></i>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        loadJoined();
+    </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cast Vote v2 - Voting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .symbol-img {
+            max-width: 40px;
+            max-height: 40px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans pb-10">
+    <header class="bg-[#2C5364] text-white px-6 py-10 rounded-b-[3rem] shadow-xl relative overflow-hidden">
+        <div class="flex items-center space-x-4 relative z-10">
+            <a href="home.html" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 id="electionTitle" class="text-xl font-extrabold tracking-tight">Loading Election...</h1>
+                <p id="electionMeta" class="text-xs text-blue-200 uppercase font-bold tracking-widest mt-0.5"></p>
+            </div>
+        </div>
+        <div class="absolute -right-10 -bottom-10 opacity-10">
+            <i class="fas fa-box-archive text-[12rem] rotate-12"></i>
+        </div>
+    </header>
+
+    <main class="px-6 mt-10 max-w-lg mx-auto">
+        <h2 class="text-lg font-black text-gray-800 mb-6 px-2">Choose Your Leader</h2>
+
+        <div id="candidatesList" class="space-y-4">
+            <!-- Loading -->
+            <div class="animate-pulse bg-white p-6 rounded-[2.5rem] border border-gray-100 h-24"></div>
+            <div class="animate-pulse bg-white p-6 rounded-[2.5rem] border border-gray-100 h-24"></div>
+        </div>
+
+        <div class="mt-10 p-6 bg-blue-50 rounded-3xl border border-blue-100 flex items-start space-x-4">
+            <i class="fas fa-circle-info text-blue-600 mt-1"></i>
+            <p class="text-xs text-blue-800 font-medium leading-relaxed">
+                Your vote is anonymous and encrypted. Once cast, it cannot be changed or retrieved.
+            </p>
+        </div>
+
+        <button id="castBtn" disabled
+            class="w-full mt-8 py-5 bg-[#2C5364] text-white rounded-[2rem] font-bold shadow-xl opacity-50 cursor-not-allowed transition-all flex items-center justify-center space-x-3">
+            <span>CAST MY VOTE</span>
+            <div id="loader" class="hidden animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+        </button>
+    </main>
+
+    <script src="api.js"></script>
+    <script>
+        const token = checkAuth();
+        const urlParams = new URLSearchParams(window.location.search);
+        const electionId = urlParams.get('id');
+        let selectedCandidate = null;
+
+        async function loadElection() {
+            try {
+                const joined = await api.getJoinedElections(token);
+                const election = joined.find(el => (el.id === electionId || el.electionId === electionId));
+
+                if (!election) {
+                    const my = await api.getMyElections(token);
+                    const el2 = my.find(el => (el.id === electionId || el.electionId === electionId));
+                    if (!el2) return alert('Election not found');
+                    render(el2);
+                } else {
+                    render(election);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function render(el) {
+            console.log("Rendering candidates version 2.2", el);
+            document.getElementById('electionTitle').innerText = el.name;
+            document.getElementById('electionMeta').innerText = `${el.date} • ${el.time || el.startTime || 'TBD'}`;
+
+            // Update heading with election name
+            const heading = document.querySelector('main h2');
+            if (heading) {
+                heading.innerText = `Choose Your Candidate for ${el.name}`;
+            }
+
+            const list = document.getElementById('candidatesList');
+            list.innerHTML = '';
+
+            el.candidates.forEach((c, index) => {
+                const div = document.createElement('div');
+                div.className = "candidate-card bg-white p-6 rounded-[2.5rem] border-2 border-transparent shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md transition-all";
+                div.onclick = () => selectCandidate(div, c.name);
+
+                // Try both symbol_url and symbolUrl
+                let sUrl = c.symbol_url || c.symbolUrl || "";
+
+                // If it looks like raw base64 without prefix, add it
+                if (sUrl && !sUrl.startsWith('http') && !sUrl.startsWith('data:image')) {
+                    sUrl = 'data:image/png;base64,' + sUrl;
+                }
+
+                const symbolHtml = sUrl ? `<img src="${sUrl}" class="symbol-img" title="Party Symbol" onerror="this.src='https://img.icons8.com/ios-filled/50/2C5364/elections.png';">` : `<i class="fas fa-vote-yea text-gray-200"></i>`;
+
+                div.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-100 shadow-sm">
+                            ${symbolHtml}
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-gray-800 text-xl">${c.name}</h3>
+                        </div>
+                    </div>
+                    <div class="check-icon w-8 h-8 rounded-full border-2 border-gray-100 flex items-center justify-center text-white transition-all">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function selectCandidate(element, name) {
+            document.querySelectorAll('.candidate-card').forEach(card => {
+                card.classList.remove('border-[#2C5364]', 'bg-blue-50/50');
+                card.querySelector('.check-icon').classList.remove('bg-[#2C5364]', 'border-[#2C5364]');
+            });
+
+            element.classList.add('border-[#2C5364]', 'bg-blue-50/50');
+            element.querySelector('.check-icon').classList.add('bg-[#2C5364]', 'border-[#2C5364]');
+
+            selectedCandidate = name;
+            const btn = document.getElementById('castBtn');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        document.getElementById('castBtn').addEventListener('click', async () => {
+            if (!selectedCandidate) return;
+
+            const confirmVote = confirm(`Are you sure you want to vote for "${selectedCandidate}"? This action is permanent and anonymous.`);
+            if (!confirmVote) return;
+
+            const btn = document.getElementById('castBtn');
+            const loader = document.getElementById('loader');
+
+            const voteData = {
+                election_id: electionId,
+                candidate_name: selectedCandidate,
+                voter_email: localStorage.getItem('userEmail'),
+                timestamp: Date.now(),
+                signature: "web_cast_" + Math.random().toString(36).substr(2, 9)
+            };
+
+            btn.disabled = true;
+            loader.classList.remove('hidden');
+
+            try {
+                const response = await api.castVote(voteData, token);
+                if (response.message.includes('Successfully') || response.message === "Successfully ") {
+                    alert('Vote Cast Successfully!');
+                    window.location.href = `vote-success.html?election=${encodeURIComponent(document.getElementById('electionTitle').innerText)}`;
+                } else {
+                    alert(response.message || 'Error casting vote');
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                loader.classList.add('hidden');
+            }
+        });
+
+        loadElection();
+    </script>
+</body>
+</html>

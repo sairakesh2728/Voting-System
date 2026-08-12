@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Voting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans pb-24">
+    <!-- Header -->
+    <header class="bg-[#2C5364] text-white px-6 py-8 rounded-b-[3rem] shadow-xl">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <p class="text-blue-200 text-sm">Welcome back,</p>
+                <h1 id="userName" class="text-2xl font-bold tracking-tight">Voter</h1>
+            </div>
+            <a href="profile.html" class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md hover:bg-white/30 transition-all">
+                <i class="fas fa-user text-xl text-white"></i>
+            </a>
+        </div>
+
+        <div class="bg-white/10 p-5 rounded-3xl backdrop-blur-md flex items-center space-x-4 border border-white/10">
+            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-vote-yea text-2xl text-[#2C5364]"></i>
+            </div>
+            <div>
+                <p class="text-xs text-blue-200 uppercase font-bold tracking-widest">Active Status</p>
+                <p class="font-bold">Verified Voter Account</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Menu -->
+    <main class="px-6 mt-8">
+        <h2 class="text-xl font-extrabold text-gray-800 mb-6 px-2">Quick Actions</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Create Election -->
+            <a href="create-election.html" class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-center space-y-3 hover:shadow-md hover:scale-[1.02] transition-all group">
+                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center group-hover:rotate-12 transition-transform">
+                    <i class="fas fa-plus text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">Create</h3>
+                    <p class="text-xs text-gray-400">Start new election</p>
+                </div>
+            </a>
+
+            <!-- My Elections -->
+            <a href="my-elections.html" class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-center space-y-3 hover:shadow-md hover:scale-[1.02] transition-all group">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center group-hover:rotate-12 transition-transform">
+                    <i class="fas fa-list-check text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">My Polls</h3>
+                    <p class="text-xs text-gray-400">Manage created</p>
+                </div>
+            </a>
+
+            <!-- Join Election -->
+            <a href="join-election.html" class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-center space-y-3 hover:shadow-md hover:scale-[1.02] transition-all group">
+                <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center group-hover:rotate-12 transition-transform">
+                    <i class="fas fa-hashtag text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">Join</h3>
+                    <p class="text-xs text-gray-400">Enter election code</p>
+                </div>
+            </a>
+
+            <!-- Joined Elections -->
+            <a href="joined-elections.html" class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-center space-y-3 hover:shadow-md hover:scale-[1.02] transition-all group">
+                <div class="w-16 h-16 bg-purple-50 text-purple-600 rounded-3xl flex items-center justify-center group-hover:rotate-12 transition-transform">
+                    <i class="fas fa-users-viewfinder text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">History</h3>
+                    <p class="text-xs text-gray-400">Polls you joined</p>
+                </div>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-4 flex justify-between items-center z-50 rounded-t-[2.5rem] shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
+        <a href="home.html" class="text-[#2C5364] flex flex-col items-center">
+            <i class="fas fa-house text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">Home</span>
+        </a>
+        <a href="my-elections.html" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-chart-pie text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">My Polls</span>
+        </a>
+        <div class="w-12 h-12 bg-[#2C5364] text-white rounded-2xl flex items-center justify-center -mt-12 shadow-lg shadow-[#2C5364]/40 border-4 border-white transform active:scale-90 transition-transform cursor-pointer" onclick="window.location.href='join-election.html'">
+            <i class="fas fa-plus"></i>
+        </div>
+        <a href="joined-elections.html" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-history text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">History</span>
+        </a>
+        <a href="profile.html" class="text-gray-300 flex flex-col items-center">
+            <i class="fas fa-user text-xl mb-1"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+        </a>
+    </nav>
+
+    <script src="api.js"></script>
+    <script>
+        const token = checkAuth();
+        document.getElementById('userName').innerText = localStorage.getItem('userName') || 'Voter';
+
+        async function loadElections() {
+            try {
+                const elections = await api.getJoinedElections(token);
+                const container = document.getElementById('liveElections');
+                container.innerHTML = '';
+
+                if (elections.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-10 text-gray-400">
+                            <i class="fas fa-inbox text-4xl mb-3"></i>
+                            <p>No active elections joined</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                elections.forEach(el => {
+                    const now = new Date();
+                    // IST is UTC+5:30. Let's adjust 'now' to match election data if it's stored in IST
+                    // For simplicity, let's assume the server/browser handles local time comparison
+
+                    const startStr = `${el.date}T${el.start_time || '00:00'}`;
+                    const endStr = `${el.date}T${el.end_time || '23:59'}`;
+
+                    const startTime = new Date(startStr);
+                    const endTime = new Date(endStr);
+
+                    let statusHtml = '';
+
+                    if (!el.start_time || !el.end_time) {
+                        statusHtml = `<span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black rounded-full uppercase tracking-tighter">Schedule Pending</span>`;
+                    } else if (now < startTime) {
+                        statusHtml = `<span class="px-3 py-1 bg-blue-100 text-blue-600 text-[10px] font-black rounded-full uppercase tracking-tighter">Starts at ${el.start_time}</span>`;
+                    } else if (now > endTime) {
+                        statusHtml = `<span class="px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black rounded-full uppercase tracking-tighter">Ended</span>`;
+                    } else {
+                        statusHtml = `<span class="px-3 py-1 bg-emerald-100 text-emerald-600 text-[10px] font-black rounded-full uppercase tracking-tighter">Voting Open</span>`;
+                    }
+
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-5 rounded-3xl border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow cursor-pointer";
+                    div.onclick = () => window.location.href = `voting.html?id=${el.id}`;
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gray-50 text-[#2C5364] rounded-2xl flex items-center justify-center font-bold">
+                                ${el.name.charAt(0)}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800">${el.name}</h3>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    ${statusHtml}
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">${el.date}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-300"></i>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        loadElections();
+    </script>
+</body>
+</html>

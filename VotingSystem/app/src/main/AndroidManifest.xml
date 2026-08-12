@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <application
+        android:name=".VotingApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.VotingSystem"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+        <activity
+            android:name=".CreateElectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ScheduleElectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ElectionCodeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".SignupEmailActivity" />
+        <activity android:name=".SignupPasswordActivity" />
+        <activity android:name=".OtpVerifyActivity" />
+        <activity android:name=".SuccessActivity" />
+        <activity android:name=".HomeActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".JoinInfoActivity" />
+        <activity android:name=".JoinCodeActivity" />
+        <activity android:name=".JoinSuccessActivity" />
+        <activity android:name=".MyElectionsActivity" />
+        <activity android:name=".ParticipantsActivity" />
+        <activity android:name=".ManageElectionActivity" />
+        <activity android:name=".JoinedElectionsActivity" />
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".VotingActivity" />
+        <activity android:name=".ResultsActivity" />
+        <activity android:name=".ReceiptActivity" />
+        <activity android:name=".VoteSuccessActivity" />
+    </application>
+
+</manifest>
