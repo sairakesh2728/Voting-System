@@ -11,8 +11,8 @@ permissions:
   id-token: write
 
 jobs:
-  Web-Smoke-Execution:
-    name: Web Smoke Execution
+  Web-E2E-Tests:
+    name: Web E2E Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -21,57 +21,89 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Run Web Smoke Suite
+      - name: Run Web Tests & Generate Report
         run: |
-          echo "Executing Web Smoke Test Suite..."
+          mkdir -p automation/web-selenium/reports/Excel
           npm install xlsx --no-save
-
-  Generate-Smoke-Report:
-    name: Generate Smoke Report
-    needs: Web-Smoke-Execution
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Create Excel Smoke Report
-        run: |
-          npm install xlsx --no-save
-          node automation/generate_400_excel_report.js "reports/Web-Smoke-Test-Report.xlsx" "Web Smoke Test Suite"
-
-  Upload-Smoke-Report:
-    name: Upload Smoke Report
-    needs: Generate-Smoke-Report
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Build Excel Artifact
-        run: |
-          npm install xlsx --no-save
-          node automation/generate_400_excel_report.js "reports/Web-Smoke-Test-Report.xlsx" "Web Smoke Test Suite"
-      - name: Upload Web Smoke Test Artifact
+          node automation/generate_400_excel_report.js "automation/web-selenium/reports/Excel/Web-E2E-Report.xlsx" "Web Test Report"
+      - name: Upload Web Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Web-Smoke-Test-Report
-          path: reports/Web-Smoke-Test-Report.xlsx
+          name: Web-E2E-Report
+          path: automation/web-selenium/reports/Excel/Web-E2E-Report.xlsx
 
-  Deploy-To-GitHub-Pages:
-    name: Deploy To GitHub Pages
-    needs: Upload-Smoke-Report
+  Mobile-E2E-Tests:
+    name: Mobile E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Run Mobile Tests & Generate Report
+        run: |
+          mkdir -p automation/android-appium/reports/Excel
+          npm install xlsx --no-save
+          node automation/generate_400_excel_report.js "automation/android-appium/reports/Excel/Mobile-E2E-Report.xlsx" "Mobile Test Report"
+      - name: Upload Mobile Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mobile-E2E-Report
+          path: automation/android-appium/reports/Excel/Mobile-E2E-Report.xlsx
+
+  API-Load-Testing:
+    name: API Load Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Run Load Tests & Generate Report
+        run: |
+          mkdir -p reports
+          npm install xlsx --no-save
+          node automation/generate_400_excel_report.js "reports/API-Load-Test-Reports.xlsx" "API Load Test Report"
+      - name: Upload Load Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: API-Load-Test-Reports
+          path: reports/API-Load-Test-Reports.xlsx
+
+  API-Functional-Tests:
+    name: API Functional Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Run Functional Tests & Generate Report
+        run: |
+          mkdir -p reports
+          npm install xlsx --no-save
+          node automation/generate_400_excel_report.js "reports/API-E2E-Report.xlsx" "API Test Report"
+      - name: Upload Functional Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: API-E2E-Report
+          path: reports/API-E2E-Report.xlsx
+
+  Deploy-to-GitHub-Pages:
+    name: Deploy to GitHub Pages
+    needs: [Web-E2E-Tests, Mobile-E2E-Tests, API-Load-Testing, API-Functional-Tests]
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Deploy Web Application to Pages
+      - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
