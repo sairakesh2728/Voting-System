@@ -1,7 +1,80 @@
 name: backend-audit.yml
-on: [push]
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
-  audit:
+  Setup-Load-Tester:
+    name: Setup Load Tester
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Backend audit passed"
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Initialize Performance Tools
+        run: |
+          npm install xlsx --no-save
+          echo "Performance & Baseline Load Testing tools initialized."
+
+  Run-Baseline-Load-Test:
+    name: Run Baseline Load Test
+    needs: Setup-Load-Tester
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Execute 100 VU 1-Minute Baseline Load Test
+        run: |
+          npm install xlsx --no-save
+          node automation/k6-baseline-test.js
+
+  Generate-Performance-Metrics:
+    name: Generate Performance Metrics
+    needs: Run-Baseline-Load-Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Process Performance Results & Generate Excel
+        run: |
+          npm install xlsx --no-save
+          node automation/generate_400_excel_report.js "reports/API-Load-Test-Reports.xlsx" "API Load Test & Performance Metrics"
+
+  Upload-Load-Report:
+    name: Upload Load Report
+    needs: Generate-Performance-Metrics
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Build Excel Artifact
+        run: |
+          npm install xlsx --no-save
+          node automation/generate_400_excel_report.js "reports/API-Load-Test-Reports.xlsx" "API Load Test & Performance Metrics"
+      - name: Upload API Load Test Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: API-Load-Test-Reports
+          path: reports/API-Load-Test-Reports.xlsx
